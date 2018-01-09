@@ -176,107 +176,107 @@ int[] setConnectionVertex() {
   }
   return connection;
 }
-//dir 0..7 
-int[] setInterjectLine(int stone, int dir) {
+int[][] setInterjectLine(int stone) {
   final int pos = stone % (stoneNum/4);
   if (pos==0) {
-    if (dir==0) return new int[]{26,33,38,37,32,45,50,51,46,39,13,20,25,24,19,6,11,12,7,0};
-    if (dir==1) return new int[]{27,35,31,45};
-    if (dir==2) return new int[]{1,2,3,16,15,14,13};
-    if (dir==3) return new int[]{8,10,6};
-    if (dir==4) return new int[]{7,12,11,6,19,24,25,20,13,39,46,51,50,45,32,377,38,33,26,0};
+    return new int[][]{
+      {26, 33, 38, 37, 32, 45, 50, 51, 46, 39, 13, 20, 25, 24, 19, 6, 11, 12, 7, 0}, 
+      {27, 35, 31, 45}, 
+      {1, 2, 3, 16, 15, 14, 13}, 
+      {8, 10, 6}, 
+      {7, 12, 11, 6, 19, 24, 25, 20, 13, 39, 46, 51, 50, 45, 32, 377, 38, 33, 26, 0}
+    };
   } else if (pos==1) {
-    if (dir==0) return new int[]{27,34,38};
-    if (dir==1) return new int[]{28,30,44,50};
-    if (dir==2) return new int[]{2,3,16,15,14,13};
-    if (dir==3) return new int[]{9,5,19};
-    if (dir==4) return new int[]{8,12};
+    return new int[][]{
+      {27, 34, 38}, 
+      {28, 30, 44, 50}, 
+      {2, 3, 16, 15, 14, 13}, 
+      {9, 5, 19}, 
+      {8, 12}
+    };
   } else if (pos==2) {
-    if (dir==0) return new int[]{1,0};
-    if (dir==1) return new int[]{27,33};
-    if (dir==2) return new int[]{28,35,36,37};
-    if (dir==3) return new int[]{29,43,49};
-    if (dir==4) return new int[]{3,16,15,14,13};
-    if (dir==5) return new int[]{4,18,24};
-    if (dir==6) return new int[]{9,10,11};
+    return new int[][]{
+      {1, 0}, 
+      {27, 33}, 
+      {28, 35, 36, 37}, 
+      {29, 43, 49}, 
+      {3, 16, 15, 14, 13}, 
+      {4, 18, 24}, 
+      {9, 10, 11}
+    };
   } else if (pos==3) {
   } else if (pos==4) {
-    if (dir==0) return new int[]{9,8,7};
-    if (dir==1) return new int[]{2,27,33};
-    if (dir==2) return new int[]{3,29,30,31,32};
-    if (dir==3) return new int[]{16,41,47};
-    if (dir==4) return new int[]{17,22,21,20};
-    if (dir==5) return new int[]{18,24};
-    if (dir==6) return new int[]{5,6};
+    return new int[][]{
+      {9, 8, 7}, 
+      {2, 27, 33}, 
+      {3, 29, 30, 31, 32}, 
+      {16, 41, 47}, 
+      {17, 22, 21, 20}, 
+      {18, 24}, 
+      {5, 6}, 
+    };
   } else if (pos==5) {
-    if (dir==0) return new int[]{10,12};
-    if (dir==1) return new int[]{9,1,26};
-    if (dir==2) return new int[]{4,3,29,30,31};
-    if (dir==3) return new int[]{17,15,40,46};
-    if (dir==4) return new int[]{18,23,25};
+    return new int[][]{
+      {10, 12}, 
+      {9, 1, 26}, 
+      {4, 3, 29, 30, 31}, 
+      {17, 15, 40, 46}, 
+      {18, 23, 25}
+    };
   } else if (pos==6) {
-    if (dir==0) return new int[]{};
-    if (dir==1) return new int[]{};
-    if (dir==2) return new int[]{};
-    if (dir==3) return new int[]{};
-    if (dir==4) return new int[]{};
-    if (dir==5) return new int[]{};
-    if (dir==6) return new int[]{};
-    if (dir==7) return new int[]{};
+    return new int[][]{
+      {11, 12, 7, 0, 26, 33, 38, 37, 32, 45, 50, 51, 46, 39, 13, 20, 25, 24, 19, 6}, 
+      {10, 8, 0}, 
+      {5, 4, 3, 29, 30, 31, 32}, 
+      {18, 22, 14, 39}, 
+      {19, 24, 25, 20, 13, 39, 46, 51, 50, 45, 32, 37, 38, 33, 26, 0, 7, 12, 11, 6}
+    };
   } else if (pos==7) {
-    if (dir==0) return new int[]{};
-    if (dir==1) return new int[]{};
-    if (dir==2) return new int[]{};
-    if (dir==3) return new int[]{};
-    if (dir==4) return new int[]{};
-    if (dir==5) return new int[]{};
-    if (dir==6) return new int[]{};
-    if (dir==7) return new int[]{};
+    return new int[][]{
+      {0, 26, 33, 38, 37, 32, 45, 50, 51, 46, 39, 13, 20, 25, 24, 19, 6, 11, 12, 7}, 
+      {1, 28, 30, 44, 50}, 
+      {8, 9, 4, 17, 22, 21, 20}, 
+      {12, 11, 6, 19, 24, 25, 20, 13, 39, 46, 51, 50, 45, 32, 37, 38, 33, 26, 0, 7}
+    };
   } else if (pos==8) {
-    if (dir==0) return new int[]{};
-    if (dir==1) return new int[]{};
-    if (dir==2) return new int[]{};
-    if (dir==3) return new int[]{};
-    if (dir==4) return new int[]{};
-    if (dir==5) return new int[]{};
-    if (dir==6) return new int[]{};
-    if (dir==7) return new int[]{};
+    return new int[][]{
+      {1, 27, 34, 38}, 
+      {2, 29, 43, 49}, 
+      {9, 4, 17, 22, 21, 20}, 
+      {10, 6}
+    };
   } else if (pos==9) {
-    if (dir==0) return new int[]{};
-    if (dir==1) return new int[]{};
-    if (dir==2) return new int[]{};
-    if (dir==3) return new int[]{};
-    if (dir==4) return new int[]{};
-    if (dir==5) return new int[]{};
-    if (dir==6) return new int[]{};
-    if (dir==7) return new int[]{};
+    return new int[][]{
+      {8, 7}, 
+      {1, 26}, 
+      {2, 28, 35, 36, 37}, 
+      {3, 42, 48, 51}, 
+      {4, 17, 22, 21, 20}, 
+      {5, 19}, 
+      {10, 11}
+    };
   } else if (pos==10) {
-    if (dir==0) return new int[]{};
-    if (dir==1) return new int[]{};
-    if (dir==2) return new int[]{};
-    if (dir==3) return new int[]{};
-    if (dir==4) return new int[]{};
-    if (dir==5) return new int[]{};
-    if (dir==6) return new int[]{};
-    if (dir==7) return new int[]{};
+    return new int[][]{
+      {8, 0}, 
+      {9, 2, 28, 35, 36, 37}, 
+      {4, 16, 41, 47}, 
+      {5, 18, 23, 25}
+    };
   } else if (pos==11) {
-    if (dir==0) return new int[]{};
-    if (dir==1) return new int[]{};
-    if (dir==2) return new int[]{};
-    if (dir==3) return new int[]{};
-    if (dir==4) return new int[]{};
-    if (dir==5) return new int[]{};
-    if (dir==6) return new int[]{};
-    if (dir==7) return new int[]{};
+    return new int[][]{
+      {12, 7, 0, 26, 33, 38, 37, 32, 45, 50, 51, 46, 39, 13, 20, 25, 24, 19, 6, 11}, 
+      {10, 9, 2, 28, 35, 36, 37}, 
+      {5, 17, 15, 40, 46}, 
+      {6, 19, 24, 25, 20, 13, 39, 46, 51, 50, 45, 32, 37, 38, 33, 26, 0, 7, 12, 11}
+    };
   } else if (pos==12) {
-    if (dir==0) return new int[]{};
-    if (dir==1) return new int[]{};
-    if (dir==2) return new int[]{};
-    if (dir==3) return new int[]{};
-    if (dir==4) return new int[]{};
-    if (dir==5) return new int[]{};
-    if (dir==6) return new int[]{};
-    if (dir==7) return new int[]{};
+    return new int[][]{
+      {7, 0, 26, 33, 38, 37, 32, 45, 50, 51, 46, 39, 13, 20, 25, 24, 19, 6, 11, 12}, 
+      {8, 1, 27, 34, 38}, 
+      {9, 3, 42, 48, 51}, 
+      {10, 5, 18, 23, 25}, 
+      {11, 6, 19, 24, 25, 20, 13, 39, 46, 51, 50, 45, 32, 37, 38, 33, 26, 0, 7, 12}
+    };
   }
   return null;
 }
