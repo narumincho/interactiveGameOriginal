@@ -28,6 +28,24 @@ void setup() {
 void draw() {
   // update
   final int hoverStone = getHoverStone();
+  int[][] interjectLines = null;
+  if (hoverStone!=-1) {
+    interjectLines = getHoverInterjectLine(hoverStone);
+    updateStone(hoverStone);
+  }
+  beforeMousePressed = mousePressed;
+  // draw
+  drawBg();
+  drawGameboard();
+  drawStone();
+  drawHoverStone(hoverStone);
+  if (hoverStone!=-1) {
+    drawInterjectLines(interjectLines);
+  }
+  drawTurnMessage();
+}
+
+void updateStone(int hoverStone) {
   if (scene==0||scene==2) {
     if (putStone(hoverStone)) {
       if (scene == 0) {
@@ -37,13 +55,6 @@ void draw() {
       }
     }
   }
-  beforeMousePressed = mousePressed;
-  // draw
-  drawBg();
-  drawGameboard();
-  drawStone();
-  drawHoverStone(hoverStone);
-  drawTurnMessage();
 }
 
 color[] setBgPattern() {
@@ -176,7 +187,7 @@ int[] setConnectionVertex() {
   }
   return connection;
 }
-int[][] setInterjectLine(int stone) {
+int[][] getInterjectLine(int stone) {
   final int pos = stone % (stoneNum/4);
   if (pos==0) {
     return new int[][]{
@@ -184,7 +195,7 @@ int[][] setInterjectLine(int stone) {
       {27, 35, 31, 45}, 
       {1, 2, 3, 16, 15, 14, 13}, 
       {8, 10, 6}, 
-      {7, 12, 11, 6, 19, 24, 25, 20, 13, 39, 46, 51, 50, 45, 32, 377, 38, 33, 26, 0}
+      {7, 12, 11, 6, 19, 24, 25, 20, 13, 39, 46, 51, 50, 45, 32, 37, 38, 33, 26, 0}
     };
   } else if (pos==1) {
     return new int[][]{
@@ -205,6 +216,7 @@ int[][] setInterjectLine(int stone) {
       {9, 10, 11}
     };
   } else if (pos==3) {
+    return new int[][]{{}};
   } else if (pos==4) {
     return new int[][]{
       {9, 8, 7}, 
@@ -219,7 +231,7 @@ int[][] setInterjectLine(int stone) {
     return new int[][]{
       {10, 12}, 
       {9, 1, 26}, 
-      {4, 3, 29, 30, 31}, 
+      {4, 3, 29, 30, 31, 32}, 
       {17, 15, 40, 46}, 
       {18, 23, 25}
     };
@@ -269,7 +281,7 @@ int[][] setInterjectLine(int stone) {
       {5, 17, 15, 40, 46}, 
       {6, 19, 24, 25, 20, 13, 39, 46, 51, 50, 45, 32, 37, 38, 33, 26, 0, 7, 12, 11}
     };
-  } else if (pos==12) {
+  } else {
     return new int[][]{
       {7, 0, 26, 33, 38, 37, 32, 45, 50, 51, 46, 39, 13, 20, 25, 24, 19, 6, 11, 12}, 
       {8, 1, 27, 34, 38}, 
@@ -278,7 +290,6 @@ int[][] setInterjectLine(int stone) {
       {11, 6, 19, 24, 25, 20, 13, 39, 46, 51, 50, 45, 32, 37, 38, 33, 26, 0, 7, 12}
     };
   }
-  return null;
 }
 
 int getHoverStone() {
@@ -295,6 +306,25 @@ int getHoverStone() {
     }
   }
   return minIndex;
+}
+
+int[][] getHoverInterjectLine(int hover) {
+  int offset = hover/(stoneNum/4);
+  int[][] lines = getInterjectLine(hover);
+  for (int i=0; i<lines.length; i++) {
+    for (int j=0; j<lines[i].length; j++) {
+      if (offset==0||offset==2) {
+        lines[i][j]=(lines[i][j]+offset*stoneNum/4)%stoneNum;
+      } else {
+        if((lines[i][j]/(stoneNum/4)) % 2 == 1){
+          lines[i][j]=(lines[i][j]+offset*stoneNum/4+stoneNum/2)%stoneNum;
+        }else{
+          lines[i][j]=(lines[i][j]+offset*stoneNum/4)%stoneNum;       
+        }
+      }
+    }
+  }
+  return lines;
 }
 
 boolean putStone(int hoverStone) {
@@ -362,6 +392,16 @@ void drawHoverStone(int hoverStone) {
   fill(#00ff00, 100);
   circle(vertexPosition[hoverStone], 50);
 }
+
+void drawInterjectLines(int[][] lines) {
+  for (int i=0; i<lines.length; i++) {
+    for (int j=0; j<lines[i].length; j++) {
+      fill(0, i*256/8, 255-i*256/8, 140);
+      circle(vertexPosition[lines[i][j]], 50);
+    }
+  }
+}
+
 
 void drawTurnMessage() {
   fill(#ffffff);
