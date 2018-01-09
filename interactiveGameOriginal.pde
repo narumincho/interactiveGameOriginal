@@ -26,8 +26,14 @@ void setup() {
 void draw() {
   // update
   final int hoverStone = getHoverStone();
-  if(scene==0||scene==2){
-    putStone(hoverStone);
+  if (scene==0||scene==2) {
+    if(putStone(hoverStone)){
+      if(scene == 0) {
+        scene = 2;
+      }else if(scene == 2){
+        scene = 0;
+      }
+    }
   }
   beforeMousePressed = mousePressed;
   // draw
@@ -35,6 +41,7 @@ void draw() {
   drawGameboard();
   drawStone();
   drawHoverStone(hoverStone);
+  drawTurnMessage();
 }
 
 color[] setBgPattern() {
@@ -73,14 +80,14 @@ PVector[] setVertexPosition() {
 }
 
 int getHoverStone() {
-  if(vmin()/3+90 < vec(mouseX, mouseY).sub(width/2,height/2).mag()){
+  if (vmin()/3+90 < vec(mouseX, mouseY).sub(width/2, height/2).mag()) {
     return -1;
   }
   int minIndex = 0;
   float minValue = vec(mouseX, mouseY).sub(vertexPosition[0]).mag();
   for (int i=1; i<stoneNum; i++) {
     final float value = vec(mouseX, mouseY).sub(vertexPosition[i]).mag();
-    if(value < minValue){
+    if (value < minValue) {
       minIndex = i;
       minValue = value;
     }
@@ -88,17 +95,19 @@ int getHoverStone() {
   return minIndex;
 }
 
-void putStone(int hoverStone) {
-  if(!beforeMousePressed && mousePressed){
-    if(hoverStone==-1){
-      return;
-    }
-    if(scene==0){
-      stone[hoverStone] = 1;
-    }else if(scene==2){
-      stone[hoverStone] = 2;
-    }
+boolean putStone(int hoverStone) {
+  if (!(!beforeMousePressed && mousePressed)) {
+    return false;
   }
+  if (hoverStone==-1) {
+    return false;
+  }
+  if (scene==0) {
+    stone[hoverStone] = 1;
+  } else if (scene==2) {
+    stone[hoverStone] = 2;
+  }
+  return true;
 }
 
 void drawBg() {
@@ -140,13 +149,23 @@ void drawStone() {
   }
 }
 
-void drawHoverStone(int hoverStone){
-  if(hoverStone == -1) {
+void drawHoverStone(int hoverStone) {
+  if (hoverStone == -1) {
     return;
   }
   noStroke();
   fill(#00ff00, 100);
-  circle(vertexPosition[hoverStone], 50);  
+  circle(vertexPosition[hoverStone], 50);
+}
+
+void drawTurnMessage() {
+  fill(#ffffff);
+  textAlign(LEFT, TOP);
+  if (scene == 0) {
+    text("white", 0, 0);
+  } else if (scene == 2) {
+    text("black", 0, 0);
+  }
 }
 
 PVector vec(float x, float y) {
