@@ -9,6 +9,8 @@
 final int stoneNum = 52;
 color[] randomBg = setBgPattern();
 PVector[] vertexPosition;
+int[] connectionVertex = connectionVertex();
+
 int[] stone = new int[stoneNum]; // 0=null 1=白 2=黒
 int scene = 0; // 0=白 1=白アニメーション 2=黒 3=黒アニメーション 4=対戦結果
 int whiteUser = 0; // 0=人間
@@ -27,10 +29,10 @@ void draw() {
   // update
   final int hoverStone = getHoverStone();
   if (scene==0||scene==2) {
-    if(putStone(hoverStone)){
-      if(scene == 0) {
+    if (putStone(hoverStone)) {
+      if (scene == 0) {
         scene = 2;
-      }else if(scene == 2){
+      } else if (scene == 2) {
         scene = 0;
       }
     }
@@ -79,6 +81,100 @@ PVector[] setVertexPosition() {
   return position;
 }
 
+int[] connectionVertex() {
+  int[] connection = new int[32*2*4+42*2];
+  int[] quarter = //32
+    { 0, 1
+    , 1, 2
+    , 2, 3
+    , 7, 8
+    , 8, 9
+    , 9, 4
+    , 12, 10
+    , 10, 5
+    , 11, 6
+    , 0, 7
+    , 1, 8
+    , 2, 9
+    , 3, 4
+    , 8, 12
+    , 9, 10
+    , 4, 5
+    , 10, 11
+    , 5, 6
+    , 0, 8
+    , 1, 9
+    , 2, 4
+    , 7, 12
+    , 8, 10
+    , 9, 5
+    , 12, 11
+    , 10, 6
+    , 1, 7
+    , 2, 8
+    , 3, 9
+    , 9, 12
+    , 4, 10
+    , 5, 11
+  };
+  int[] other = //42
+    { 26, 0
+    ,27, 1
+    ,28, 2
+    ,29, 3
+    ,42,16
+    ,41,15
+    ,40,14
+    ,39,13
+    ,32,45
+    ,31,44
+    ,30,43
+    ,29,42
+    ,3,16
+    ,4,17
+    ,5,18
+    ,6,19
+    ,26,1
+    ,27,2
+    ,28,3
+    ,29,16
+    ,42,15
+    ,41,14
+    ,40,13
+    ,27,0
+    ,28,1
+    ,29,2
+    ,42,3
+    ,41,16
+    ,40,15
+    ,39,14
+    ,32,44
+    ,31,43
+    ,30,42
+    ,45,31
+    ,44,30
+    ,43,29
+    ,3,17
+    ,4,18
+    ,5,19
+    ,16,4
+    ,17,5
+    ,18,6
+  };
+  for(int i=0; i<4; i++){
+    for(int j=0; j<32; j++) {
+      //from
+      connection[i*64 + j*2] = quarter[j*2] + i*stoneNum/4;
+      //to
+      connection[i*64 + j*2+1] = quarter[j*2+1] + i*stoneNum/4;
+    }
+  }
+  for(int i=0; i<42*2; i++) {
+    connection[64*4+i] = other[i];
+  }
+  return connection;
+}
+
 int getHoverStone() {
   if (vmin()/3+90 < vec(mouseX, mouseY).sub(width/2, height/2).mag()) {
     return -1;
@@ -121,13 +217,16 @@ void drawBg() {
 }
 
 void drawGameboard() {
+  stroke(#000000);
+  strokeWeight(3);
+  for(int i=0; i<connectionVertex.length/2; i++) {
+    line(vertexPosition[connectionVertex[i*2]],vertexPosition[connectionVertex[i*2+1]]);    
+  }
+  textSize(30);
   for (int i=0; i<stoneNum; i++) {
-    stroke(#000000);
-    strokeWeight(3);
     fill(#aaaaaa);
     circle(vertexPosition[i], 25);
     fill(#ff0000);
-    textSize(30);
     text(str(i), vertexPosition[i]);
   }
 }
@@ -178,6 +277,10 @@ void circle(PVector position, float radious) {
 
 void text(String disc, PVector position) {
   text(disc, position.x, position.y);
+}
+
+void line(PVector position0, PVector position1) {
+  line(position0.x, position0.y, position1.x, position1.y);
 }
 
 float vmin() {
