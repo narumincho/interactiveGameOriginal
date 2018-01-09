@@ -511,7 +511,7 @@ void drawTurnMessage() {
 }
 
 void drawPassMessage() {
-  if(!(annimationType==1&&animationCount!=-1)){
+  if(!(annimationType==1&&animationCount!=-1&&(scene==1||scene==3))){
     return;
   }
   fill(#ffffff);
@@ -527,16 +527,21 @@ void drawResultMessage() {
   textAlign(CENTER, CENTER);
   textSize(120);
   final int whiteNum = countStone(1);
-  final int blackNum = countStone(1);
+  final int blackNum = countStone(2);
+  String msg = "";
   if(blackNum < whiteNum){
-    text("white win",width/2,height/2);  
+    msg = "white win";
   }else if(whiteNum < blackNum){
-    text("black win",width/2,height/2);  
+    msg = "black win";
   }else{
-    text("draw",width/2,height/2);  
+    msg = "draw";
   }
+  fill(#FFaa22);
+  text(msg, width/2, height/2 + 5);  
+  fill(#FF9800);
+  text(msg, width/2, height/2);  
   textSize(60);
-  text(str(whiteNum)+"-"+str(blackNum),width/2, height/2+60);
+  text(str(whiteNum)+"-"+str(blackNum),width/2, height/2+100);
 }
 
 PVector vec(float x, float y) {
