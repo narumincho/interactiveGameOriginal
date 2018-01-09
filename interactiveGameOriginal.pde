@@ -9,7 +9,7 @@
 final int stoneNum = 52;
 color[] randomBg = setBgPattern();
 PVector[] vertexPosition;
-int[] connectionVertex = connectionVertex();
+int[] connectionVertex = setConnectionVertex();
 
 int[] stone = new int[stoneNum]; // 0=null 1=白 2=黒
 int scene = 0; // 0=白 1=白アニメーション 2=黒 3=黒アニメーション 4=対戦結果
@@ -81,98 +81,204 @@ PVector[] setVertexPosition() {
   return position;
 }
 
-int[] connectionVertex() {
+int[] setConnectionVertex() {
   int[] connection = new int[32*2*4+42*2];
   int[] quarter = //32
-    { 0, 1
-    , 1, 2
-    , 2, 3
-    , 7, 8
-    , 8, 9
-    , 9, 4
-    , 12, 10
-    , 10, 5
-    , 11, 6
-    , 0, 7
-    , 1, 8
-    , 2, 9
-    , 3, 4
-    , 8, 12
-    , 9, 10
-    , 4, 5
-    , 10, 11
-    , 5, 6
-    , 0, 8
-    , 1, 9
-    , 2, 4
-    , 7, 12
-    , 8, 10
-    , 9, 5
-    , 12, 11
-    , 10, 6
-    , 1, 7
-    , 2, 8
-    , 3, 9
-    , 9, 12
-    , 4, 10
-    , 5, 11
+  { 
+    0, 1
+      , 1, 2
+      , 2, 3
+      , 7, 8
+      , 8, 9
+      , 9, 4
+      , 12, 10
+      , 10, 5
+      , 11, 6
+      , 0, 7
+      , 1, 8
+      , 2, 9
+      , 3, 4
+      , 8, 12
+      , 9, 10
+      , 4, 5
+      , 10, 11
+      , 5, 6
+      , 0, 8
+      , 1, 9
+      , 2, 4
+      , 7, 12
+      , 8, 10
+      , 9, 5
+      , 12, 11
+      , 10, 6
+      , 1, 7
+      , 2, 8
+      , 3, 9
+      , 9, 12
+      , 4, 10
+      , 5, 11
   };
   int[] other = //42
-    { 26, 0
-    ,27, 1
-    ,28, 2
-    ,29, 3
-    ,42,16
-    ,41,15
-    ,40,14
-    ,39,13
-    ,32,45
-    ,31,44
-    ,30,43
-    ,29,42
-    ,3,16
-    ,4,17
-    ,5,18
-    ,6,19
-    ,26,1
-    ,27,2
-    ,28,3
-    ,29,16
-    ,42,15
-    ,41,14
-    ,40,13
-    ,27,0
-    ,28,1
-    ,29,2
-    ,42,3
-    ,41,16
-    ,40,15
-    ,39,14
-    ,32,44
-    ,31,43
-    ,30,42
-    ,45,31
-    ,44,30
-    ,43,29
-    ,3,17
-    ,4,18
-    ,5,19
-    ,16,4
-    ,17,5
-    ,18,6
+  { 
+    26, 0
+      , 27, 1
+      , 28, 2
+      , 29, 3
+      , 42, 16
+      , 41, 15
+      , 40, 14
+      , 39, 13
+      , 32, 45
+      , 31, 44
+      , 30, 43
+      , 29, 42
+      , 3, 16
+      , 4, 17
+      , 5, 18
+      , 6, 19
+      , 26, 1
+      , 27, 2
+      , 28, 3
+      , 29, 16
+      , 42, 15
+      , 41, 14
+      , 40, 13
+      , 27, 0
+      , 28, 1
+      , 29, 2
+      , 42, 3
+      , 41, 16
+      , 40, 15
+      , 39, 14
+      , 32, 44
+      , 31, 43
+      , 30, 42
+      , 45, 31
+      , 44, 30
+      , 43, 29
+      , 3, 17
+      , 4, 18
+      , 5, 19
+      , 16, 4
+      , 17, 5
+      , 18, 6
   };
-  for(int i=0; i<4; i++){
-    for(int j=0; j<32; j++) {
+  for (int i=0; i<4; i++) {
+    for (int j=0; j<32; j++) {
       //from
       connection[i*64 + j*2] = quarter[j*2] + i*stoneNum/4;
       //to
       connection[i*64 + j*2+1] = quarter[j*2+1] + i*stoneNum/4;
     }
   }
-  for(int i=0; i<42*2; i++) {
+  for (int i=0; i<42*2; i++) {
     connection[64*4+i] = other[i];
   }
   return connection;
+}
+//dir 0..7 
+int[] setInterjectLine(int stone, int dir) {
+  final int pos = stone % (stoneNum/4);
+  if (pos==0) {
+    if (dir==0) return new int[]{26,33,38,37,32,45,50,51,46,39,13,20,25,24,19,6,11,12,7,0};
+    if (dir==1) return new int[]{27,35,31,45};
+    if (dir==2) return new int[]{1,2,3,16,15,14,13};
+    if (dir==3) return new int[]{8,10,6};
+    if (dir==4) return new int[]{7,12,11,6,19,24,25,20,13,39,46,51,50,45,32,377,38,33,26,0};
+  } else if (pos==1) {
+    if (dir==0) return new int[]{27,34,38};
+    if (dir==1) return new int[]{28,30,44,50};
+    if (dir==2) return new int[]{2,3,16,15,14,13};
+    if (dir==3) return new int[]{9,5,19};
+    if (dir==4) return new int[]{8,12};
+  } else if (pos==2) {
+    if (dir==0) return new int[]{1,0};
+    if (dir==1) return new int[]{27,33};
+    if (dir==2) return new int[]{28,35,36,37};
+    if (dir==3) return new int[]{29,43,49};
+    if (dir==4) return new int[]{3,16,15,14,13};
+    if (dir==5) return new int[]{4,18,24};
+    if (dir==6) return new int[]{9,10,11};
+  } else if (pos==3) {
+  } else if (pos==4) {
+    if (dir==0) return new int[]{9,8,7};
+    if (dir==1) return new int[]{2,27,33};
+    if (dir==2) return new int[]{3,29,30,31,32};
+    if (dir==3) return new int[]{16,41,47};
+    if (dir==4) return new int[]{17,22,21,20};
+    if (dir==5) return new int[]{18,24};
+    if (dir==6) return new int[]{5,6};
+  } else if (pos==5) {
+    if (dir==0) return new int[]{10,12};
+    if (dir==1) return new int[]{9,1,26};
+    if (dir==2) return new int[]{4,3,29,30,31};
+    if (dir==3) return new int[]{17,15,40,46};
+    if (dir==4) return new int[]{18,23,25};
+  } else if (pos==6) {
+    if (dir==0) return new int[]{};
+    if (dir==1) return new int[]{};
+    if (dir==2) return new int[]{};
+    if (dir==3) return new int[]{};
+    if (dir==4) return new int[]{};
+    if (dir==5) return new int[]{};
+    if (dir==6) return new int[]{};
+    if (dir==7) return new int[]{};
+  } else if (pos==7) {
+    if (dir==0) return new int[]{};
+    if (dir==1) return new int[]{};
+    if (dir==2) return new int[]{};
+    if (dir==3) return new int[]{};
+    if (dir==4) return new int[]{};
+    if (dir==5) return new int[]{};
+    if (dir==6) return new int[]{};
+    if (dir==7) return new int[]{};
+  } else if (pos==8) {
+    if (dir==0) return new int[]{};
+    if (dir==1) return new int[]{};
+    if (dir==2) return new int[]{};
+    if (dir==3) return new int[]{};
+    if (dir==4) return new int[]{};
+    if (dir==5) return new int[]{};
+    if (dir==6) return new int[]{};
+    if (dir==7) return new int[]{};
+  } else if (pos==9) {
+    if (dir==0) return new int[]{};
+    if (dir==1) return new int[]{};
+    if (dir==2) return new int[]{};
+    if (dir==3) return new int[]{};
+    if (dir==4) return new int[]{};
+    if (dir==5) return new int[]{};
+    if (dir==6) return new int[]{};
+    if (dir==7) return new int[]{};
+  } else if (pos==10) {
+    if (dir==0) return new int[]{};
+    if (dir==1) return new int[]{};
+    if (dir==2) return new int[]{};
+    if (dir==3) return new int[]{};
+    if (dir==4) return new int[]{};
+    if (dir==5) return new int[]{};
+    if (dir==6) return new int[]{};
+    if (dir==7) return new int[]{};
+  } else if (pos==11) {
+    if (dir==0) return new int[]{};
+    if (dir==1) return new int[]{};
+    if (dir==2) return new int[]{};
+    if (dir==3) return new int[]{};
+    if (dir==4) return new int[]{};
+    if (dir==5) return new int[]{};
+    if (dir==6) return new int[]{};
+    if (dir==7) return new int[]{};
+  } else if (pos==12) {
+    if (dir==0) return new int[]{};
+    if (dir==1) return new int[]{};
+    if (dir==2) return new int[]{};
+    if (dir==3) return new int[]{};
+    if (dir==4) return new int[]{};
+    if (dir==5) return new int[]{};
+    if (dir==6) return new int[]{};
+    if (dir==7) return new int[]{};
+  }
+  return null;
 }
 
 int getHoverStone() {
@@ -219,8 +325,8 @@ void drawBg() {
 void drawGameboard() {
   stroke(#000000);
   strokeWeight(3);
-  for(int i=0; i<connectionVertex.length/2; i++) {
-    line(vertexPosition[connectionVertex[i*2]],vertexPosition[connectionVertex[i*2+1]]);    
+  for (int i=0; i<connectionVertex.length/2; i++) {
+    line(vertexPosition[connectionVertex[i*2]], vertexPosition[connectionVertex[i*2+1]]);
   }
   textSize(30);
   for (int i=0; i<stoneNum; i++) {
