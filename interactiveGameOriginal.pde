@@ -12,42 +12,85 @@ PVector[] vertexPosition;
 int[] connectionVertex = setConnectionVertex();
 
 int[] stone = new int[stoneNum]; // 0=null 1=白 2=黒
+int[] undoRedoLocation = new int[stoneNum];
+
 int scene = 0; // 0=白 1=白アニメーション 2=黒 3=黒アニメーション 4=対戦結果
 int whiteUser = 0; // 0=人間
 int blackUser = 0; // 0=人間
 boolean beforeMousePressed = false;
-
+int annimationType; //0=ひっくり返す 1=Pass
+int animationCount = -1;
+int cauPutAnim = 0;
+int passCount = 0;
 void setup() {
   size(1600, 1200);
   vertexPosition = setVertexPosition();
   for (int i=0; i<stoneNum; i++) {
     stone[i] = 0;
   }
+  stone[29]=1;
+  stone[16]=1;
+  stone[ 3]=2;
+  stone[42]=2;
 }
 
 void draw() {
   // update
-  final int hoverStone = getHoverStone();
-  int[][] interjectLines = null;
-  if (hoverStone!=-1) {
-    interjectLines = getHoverInterjectLine(hoverStone);
-    updateStone(hoverStone);
+  int[] canPutLocations = null;
+  int hoverStone = -1;
+  if (scene==0 || scene==2) {
+    canPutLocations = getCanPutLocations();
+    if (canPutLocations.length==0) {
+      scene += 1;
+      animationCount = 60;
+      annimationType = 1;
+      passCount = (passCount + 1);
+      if(1<passCount || 0==countStone(0)){
+        scene = 4;
+      }
+    } else {
+      passCount = 0;
+      cauPutAnim = (cauPutAnim + 1) % 60;
+      hoverStone = getHoverStone(canPutLocations);
+      if (hoverStone!=-1) {
+        updateStone(hoverStone);
+      }
+    }
+  } else {
+    animationCount -= 1;
+    if (animationCount<0) {
+      scene = (scene + 1)%4;
+      return;
+    }
   }
   beforeMousePressed = mousePressed;
   // draw
   drawBg();
   drawGameboard();
   drawStone();
-  drawHoverStone(hoverStone);
-  if (hoverStone!=-1) {
-    drawInterjectLines(interjectLines);
+  if (scene==0 || scene==2) {
+    drawCanPut(canPutLocations);
+    drawHoverStone(hoverStone);
   }
   drawTurnMessage();
+  drawPassMessage();
+  drawResultMessage();
+}
+
+int countStone(int stoneType) {
+  int count = 0;
+  for(int i=0;i<stoneNum;i++){
+    if(stone[i]==stoneType){
+      count += 1;
+    }
+  }
+  return count;
 }
 
 void updateStone(int hoverStone) {
   if (scene==0||scene==2) {
     if (putStone(hoverStone)) {
+      turnStones(hoverStone);
       if (scene == 0) {
         scene = 2;
       } else if (scene == 2) {
@@ -187,26 +230,23 @@ int[] setConnectionVertex() {
   }
   return connection;
 }
-int[][] getInterjectLine(int stone) {
-  final int pos = stone % (stoneNum/4);
-  if (pos==0) {
-    return new int[][]{
+int[][][] getInterjectLinesStones() {
+  return new int[][][]{
+    { //0
       {26, 33, 38, 37, 32, 45, 50, 51, 46, 39, 13, 20, 25, 24, 19, 6, 11, 12, 7, 0}, 
       {27, 35, 31, 45}, 
       {1, 2, 3, 16, 15, 14, 13}, 
       {8, 10, 6}, 
       {7, 12, 11, 6, 19, 24, 25, 20, 13, 39, 46, 51, 50, 45, 32, 37, 38, 33, 26, 0}
-    };
-  } else if (pos==1) {
-    return new int[][]{
+    }, 
+    { //1
       {27, 34, 38}, 
       {28, 30, 44, 50}, 
       {2, 3, 16, 15, 14, 13}, 
       {9, 5, 19}, 
       {8, 12}
-    };
-  } else if (pos==2) {
-    return new int[][]{
+    }, 
+    { //2
       {1, 0}, 
       {27, 33}, 
       {28, 35, 36, 37}, 
@@ -214,11 +254,11 @@ int[][] getInterjectLine(int stone) {
       {3, 16, 15, 14, 13}, 
       {4, 18, 24}, 
       {9, 10, 11}
-    };
-  } else if (pos==3) {
-    return new int[][]{{}};
-  } else if (pos==4) {
-    return new int[][]{
+    }, //3
+    {
+    }
+    , 
+    { //4
       {9, 8, 7}, 
       {2, 27, 33}, 
       {3, 29, 30, 31, 32}, 
@@ -226,39 +266,34 @@ int[][] getInterjectLine(int stone) {
       {17, 22, 21, 20}, 
       {18, 24}, 
       {5, 6}, 
-    };
-  } else if (pos==5) {
-    return new int[][]{
+    }, 
+    { //5
       {10, 12}, 
       {9, 1, 26}, 
       {4, 3, 29, 30, 31, 32}, 
       {17, 15, 40, 46}, 
       {18, 23, 25}
-    };
-  } else if (pos==6) {
-    return new int[][]{
+    }, 
+    { //6
       {11, 12, 7, 0, 26, 33, 38, 37, 32, 45, 50, 51, 46, 39, 13, 20, 25, 24, 19, 6}, 
       {10, 8, 0}, 
       {5, 4, 3, 29, 30, 31, 32}, 
       {18, 22, 14, 39}, 
       {19, 24, 25, 20, 13, 39, 46, 51, 50, 45, 32, 37, 38, 33, 26, 0, 7, 12, 11, 6}
-    };
-  } else if (pos==7) {
-    return new int[][]{
+    }, 
+    { //7
       {0, 26, 33, 38, 37, 32, 45, 50, 51, 46, 39, 13, 20, 25, 24, 19, 6, 11, 12, 7}, 
       {1, 28, 30, 44, 50}, 
       {8, 9, 4, 17, 22, 21, 20}, 
       {12, 11, 6, 19, 24, 25, 20, 13, 39, 46, 51, 50, 45, 32, 37, 38, 33, 26, 0, 7}
-    };
-  } else if (pos==8) {
-    return new int[][]{
+    }, 
+    { //8
       {1, 27, 34, 38}, 
       {2, 29, 43, 49}, 
       {9, 4, 17, 22, 21, 20}, 
       {10, 6}
-    };
-  } else if (pos==9) {
-    return new int[][]{
+    }, 
+    { //9
       {8, 7}, 
       {1, 26}, 
       {2, 28, 35, 36, 37}, 
@@ -266,65 +301,105 @@ int[][] getInterjectLine(int stone) {
       {4, 17, 22, 21, 20}, 
       {5, 19}, 
       {10, 11}
-    };
-  } else if (pos==10) {
-    return new int[][]{
+    }, 
+    { //10
       {8, 0}, 
       {9, 2, 28, 35, 36, 37}, 
       {4, 16, 41, 47}, 
       {5, 18, 23, 25}
-    };
-  } else if (pos==11) {
-    return new int[][]{
+    }, 
+    { //11
       {12, 7, 0, 26, 33, 38, 37, 32, 45, 50, 51, 46, 39, 13, 20, 25, 24, 19, 6, 11}, 
       {10, 9, 2, 28, 35, 36, 37}, 
       {5, 17, 15, 40, 46}, 
       {6, 19, 24, 25, 20, 13, 39, 46, 51, 50, 45, 32, 37, 38, 33, 26, 0, 7, 12, 11}
-    };
-  } else {
-    return new int[][]{
+    }, 
+    { //13
       {7, 0, 26, 33, 38, 37, 32, 45, 50, 51, 46, 39, 13, 20, 25, 24, 19, 6, 11, 12}, 
       {8, 1, 27, 34, 38}, 
       {9, 3, 42, 48, 51}, 
       {10, 5, 18, 23, 25}, 
       {11, 6, 19, 24, 25, 20, 13, 39, 46, 51, 50, 45, 32, 37, 38, 33, 26, 0, 7, 12}
-    };
-  }
+    }
+  };
 }
 
-int getHoverStone() {
+int getHoverStone(int[] canPutLocation) {
   if (vmin()/3+90 < vec(mouseX, mouseY).sub(width/2, height/2).mag()) {
     return -1;
   }
-  int minIndex = 0;
-  float minValue = vec(mouseX, mouseY).sub(vertexPosition[0]).mag();
-  for (int i=1; i<stoneNum; i++) {
-    final float value = vec(mouseX, mouseY).sub(vertexPosition[i]).mag();
+  int minIndex = canPutLocation[0];
+  float minValue = vec(mouseX, mouseY).sub(vertexPosition[canPutLocation[0]]).mag();
+  for (int i=1; i<canPutLocation.length; i++) {
+    final float value = vec(mouseX, mouseY).sub(vertexPosition[canPutLocation[i]]).mag();
     if (value < minValue) {
-      minIndex = i;
+      minIndex = canPutLocation[i];
       minValue = value;
     }
   }
   return minIndex;
 }
 
-int[][] getHoverInterjectLine(int hover) {
-  int offset = hover/(stoneNum/4);
-  int[][] lines = getInterjectLine(hover);
+int[][] getInterjectLine(int pos) {
+  int offset = pos / (stoneNum/4);
+  int[][] lines = getInterjectLinesStones()[pos % (stoneNum/4)];
   for (int i=0; i<lines.length; i++) {
     for (int j=0; j<lines[i].length; j++) {
       if (offset==0||offset==2) {
         lines[i][j]=(lines[i][j]+offset*stoneNum/4)%stoneNum;
       } else {
-        if((lines[i][j]/(stoneNum/4)) % 2 == 1){
+        if ((lines[i][j]/(stoneNum/4)) % 2 == 1) {
           lines[i][j]=(lines[i][j]+offset*stoneNum/4+stoneNum/2)%stoneNum;
-        }else{
-          lines[i][j]=(lines[i][j]+offset*stoneNum/4)%stoneNum;       
+        } else {
+          lines[i][j]=(lines[i][j]+offset*stoneNum/4)%stoneNum;
         }
       }
     }
   }
   return lines;
+}
+
+int[] getCanPutLocations() {
+  ArrayList<Integer> canPutLocations = new ArrayList<Integer>();
+  for (int i=0; i<stoneNum; i++) {
+    if (stone[i]!=0) {
+      continue;
+    }
+    if (canPut(i)) {
+      canPutLocations.add(i);
+    }
+  }
+  int[] result = new int[canPutLocations.size()];
+  for (int i=0; i<result.length; i++) {
+    result[i] = canPutLocations.get(i);
+  }
+  return result;
+}
+
+boolean canPut(int pos) {
+  final int[][] lines = getInterjectLine(pos);
+  for (int i=0; i<lines.length; i++) {
+    if(canPutLine(lines[i])){
+      return true;
+    }
+  }
+  return false;
+}
+
+boolean canPutLine(int[] line) {
+  final int same = (scene==0)? 1:2;
+  for (int i=0; i<line.length; i++) {
+    if (stone[line[i]]==0 ) {
+      return false;
+    }
+    if (i==0 && stone[line[i]]==same) {
+      return false;
+    }
+    if (0<i && stone[line[i]]==same) {
+      return true;
+    }
+  }
+  return false;
 }
 
 boolean putStone(int hoverStone) {
@@ -340,6 +415,22 @@ boolean putStone(int hoverStone) {
     stone[hoverStone] = 2;
   }
   return true;
+}
+
+void turnStones(int pos) {
+  final int same = (scene==0)? 1:2;
+  final int diff = (scene==0)? 2:1;
+  int[][] lines = getInterjectLine(pos);
+  for(int i=0; i<lines.length; i++) {
+    if (canPutLine(lines[i])) {
+      for(int j=0; j<lines[i].length; j++){
+        if(stone[lines[i][j]]!=diff) {
+          break;
+        }
+        stone[lines[i][j]] = same;
+      }
+    }
+  }
 }
 
 void drawBg() {
@@ -360,10 +451,8 @@ void drawGameboard() {
   }
   textSize(30);
   for (int i=0; i<stoneNum; i++) {
-    fill(#aaaaaa);
+    fill(110, 152, 135);
     circle(vertexPosition[i], 25);
-    fill(#ff0000);
-    text(str(i), vertexPosition[i]);
   }
 }
 
@@ -388,29 +477,66 @@ void drawHoverStone(int hoverStone) {
   if (hoverStone == -1) {
     return;
   }
-  noStroke();
-  fill(#00ff00, 100);
+  stroke(#ff9800);
+  fill(stoneColor(nowStone()), 100);
   circle(vertexPosition[hoverStone], 50);
 }
 
-void drawInterjectLines(int[][] lines) {
-  for (int i=0; i<lines.length; i++) {
-    for (int j=0; j<lines[i].length; j++) {
-      fill(0, i*256/8, 255-i*256/8, 140);
-      circle(vertexPosition[lines[i][j]], 50);
-    }
+void drawCanPut(int[] pos) {
+  for (int i=0; i<pos.length; i++) {
+    colorMode(HSB, 360, 100, 100);
+    fill(i*360/pos.length, 100, 100, 30+((30<=cauPutAnim)?60-cauPutAnim:cauPutAnim)*4);
+    colorMode(RGB, 256, 256, 256);
+    noStroke();
+    circle(vertexPosition[pos[i]], 50);
   }
 }
 
 
 void drawTurnMessage() {
-  fill(#ffffff);
   textAlign(LEFT, TOP);
   if (scene == 0) {
+    fill(stoneColor(nowStone()));
     text("white", 0, 0);
-  } else if (scene == 2) {
+  } else if(scene == 1) {
+    fill(stoneColor(nowStone()));
+    text("white anim", 0, 0);    
+  }else if (scene == 2) {
+    fill(stoneColor(nowStone()));
     text("black", 0, 0);
+  }else if (scene == 3) {
+    fill(stoneColor(nowStone()));
+    text("black anim", 0, 0);
   }
+}
+
+void drawPassMessage() {
+  if(!(annimationType==1&&animationCount!=-1)){
+    return;
+  }
+  fill(#ffffff);
+  textAlign(CENTER, CENTER);
+  textSize(60);
+  text("-PASS-",width*(60-animationCount)/60,height/2);
+}
+
+void drawResultMessage() {
+  if(scene!=4){
+    return;
+  }
+  textAlign(CENTER, CENTER);
+  textSize(120);
+  final int whiteNum = countStone(1);
+  final int blackNum = countStone(1);
+  if(blackNum < whiteNum){
+    text("white win",width/2,height/2);  
+  }else if(whiteNum < blackNum){
+    text("black win",width/2,height/2);  
+  }else{
+    text("draw",width/2,height/2);  
+  }
+  textSize(60);
+  text(str(whiteNum)+"-"+str(blackNum),width/2, height/2+60);
 }
 
 PVector vec(float x, float y) {
@@ -431,4 +557,12 @@ void line(PVector position0, PVector position1) {
 
 float vmin() {
   return min(width, height);
+}
+
+int nowStone() {
+  return (scene<=1)? 1:2;
+}
+
+color stoneColor(int stone) {
+  return (stone==1)? #ffffff: #000000;
 }
