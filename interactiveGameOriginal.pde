@@ -45,10 +45,10 @@ void draw() {
 }
 
 color[] setBgPattern() {
-  final int size = 6;
+  final int size = 10;
   color[] colors = new color[size*size];
   for (int i=0; i<size*size; i++) {
-    colors[i] = color(random(110, 115), random(152, 157), random(135, 140));
+    colors[i] = color(random(100, 115), random(142, 157), random(125, 140));
   }
   return colors;
 }
@@ -111,11 +111,11 @@ boolean putStone(int hoverStone) {
 }
 
 void drawBg() {
-  for (int x=0; x<width/3; x++) {
-    for (int y=0; y<height/3; y++) {
+  for (int x=0; x<width/8; x++) {
+    for (int y=0; y<height/8; y++) {
       noStroke();
-      fill(randomBg[(x+(y*width/3))%36]);
-      rect(x*3, y*3, 3, 3);
+      fill(randomBg[x%10+y%10*10]);
+      rect(x*8, y*8, 8, 8);
     }
   }
 }
